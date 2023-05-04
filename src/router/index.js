@@ -221,7 +221,7 @@ router.afterEach(async (to, from) => {
         }
     } catch (error) {
         console.log(error);
-        router.push({ name: 'Login' });
+        // router.push({ name: 'Login' });
     }
 });
 export default router;
