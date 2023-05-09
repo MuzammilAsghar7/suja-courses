@@ -162,10 +162,6 @@ const initFilters = () => {
     <div class="grid">
         <div class="col-12">
             <div class="card">
-<pre>
-    {{ this.$store.state.users }}
-</pre>
-
                 <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>

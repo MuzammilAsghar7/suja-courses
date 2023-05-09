@@ -108,6 +108,14 @@ const initFilters = () => {
                     </template>
                  </Column>
 
+                 <Column header="Add Question">
+                    <template #body="slotProps">
+                        <router-link  :to="{ path: '/add-question', query: { lessonId:slotProps.data.id  }}">
+                            <Button icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
+                        </router-link>
+                    </template>
+                 </Column>
+
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <router-link  :to="{ path: '/add-lesson', query: { lessonId:slotProps.data.id,edit:true  }}">

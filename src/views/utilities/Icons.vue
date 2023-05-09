@@ -24,7 +24,6 @@ onMounted(() => {
                 else if (icon1.properties.name > icon2.properties.name) return 1;
                 else return 0;
             });
-
             icons.value = data;
         });
 });

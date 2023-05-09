@@ -39,7 +39,7 @@ export default class QuestionService {
          var fileData = new FormData();
          fileData.append('file', lesson.file);
          console.log(lesson);
-        return axios.post('http://127.0.0.1:8000/api/add-lesson', {
+        return axios.post('/add-lesson', {
             ...lesson,
             fileData
           },{
@@ -54,7 +54,7 @@ export default class QuestionService {
      }
 
      getChapter(id){
-        return axios.get('http://127.0.0.1:8000/api/chapters/'+id)
+        return axios.get('/api/chapters/'+id)
         .then((res) => res.data)
         .catch(function (error) {
           error;

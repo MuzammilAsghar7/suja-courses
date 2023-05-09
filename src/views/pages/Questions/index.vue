@@ -96,7 +96,13 @@ const initFilters = () => {
                         <span class="p-column-title">Status</span>
                         <span :class="'product-badge status-' + (slotProps.data.status == 1 ? 'Enabled' : 'Disabled')">{{ slotProps.data.status == 1 ? "Enabled" : 'Disabled' }}</span>
                     </template>
-                    </Column>
+                </Column>
+                <Column field="status" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <template #body="slotProps">
+                        <span class="p-column-title">Add Question</span>
+                        <span :class="'product-badge status-' + (slotProps.data.status == 1 ? 'Enabled' : 'Disabled')">{{ slotProps.data.status == 1 ? "Enabled" : 'Disabled' }}</span>
+                    </template>
+                </Column>
                 <Column field="content" header="Content">
                     <template #body="slotProps">
                         <div class="py-3"

@@ -5,7 +5,7 @@ import { computed } from 'vue';
 import Editor from 'primevue/editor';
 import { ref,onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import LessonService from '@/service/LessonService.js';
+import QuestionService from '@/service/QuestionService.js';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useStore } from 'vuex';
 const route = useRoute();
@@ -13,6 +13,8 @@ const store = useStore();
 const toast = useToast();
 
 const lessons = computed(() =>  store.state.lessons )
+const configs = computed(() =>  store.state.global.config )
+const questionTypes = computed(() => store.getters.questionTypes)
 let lessonId = route.query.lessonId;
 let chapterId = route.query.chapterId;
 let edit = route.query.edit;
@@ -20,13 +22,13 @@ var mcqs = ref([{ question : '',answerOptions:[]}]);
 const selectedCountry = ref();
 const pageTitle = ref('Add a new Question');
 const loading = ref(true); 
-const lesson = ref({status:1,chapter_id:chapterId});
+const question = ref({status:1,lesson_id:lessonId});
 // import { useLayout } from '@/layout/composables/layout';
-const lessonService = new LessonService();
+const questionService = new QuestionService();
 onMounted(()=>{
     if(edit){
         pageTitle.value = "Edit lesson"
-        lessonService.getLesson(lessonId).then((data) => { lesson.value = data.data; console.log(data); loading.value=false});
+        questionService.getQuestion(lessonId).then((data) => { question.value = data.data; console.log(data); loading.value=false});
     }else
     {
         loading.value=false
@@ -45,29 +47,36 @@ const addMoreQuestion = () => {
     mcqs.value[inx] = { lesson : '',answerOptions:[]};
     console.log(mcqs.value);
 }
-
-const saveLesson = () => {
-    if(lessonId){
-        console.log(lesson.value)
-        lessonService.updateLesson(lessonId,lesson.value)
-        .then((data) => { 
+const saveQuestion = () => {
+    console.log(23232);
+    if(lessonId && edit){
+        questionService.updateQuestion(lessonId,question.value)
+        .then((data) => {
             loading.value=false;  
-            toast.add({ severity: 'success', summary: 'Updated', detail: 'Lesson has been updated Successfully.', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Updated', detail: 'Question has been updated Successfully.', life: 3000 });
         });
     }else{
-        console.log('add lesson')
-        lessonService.addLesson(lesson.value).then((response) => { 
-            toast.add({ severity: 'success', summary: 'Added', detail: 'Lesson has been added Successfully.', life: 3000 })
+        questionService.addQuestion(question.value).then((response) => { 
+            if(response.status){
+               toast.add({ severity: 'success', summary: 'Added', detail: 'Question has been added Successfully.', life: 3000 })
+            }else
+            {
+                response.errors.forEach((error) => {
+                    toast.add({ severity: 'error', summary: 'Error', detail: error.error, life: 3000 })
+                })
+            }
         })
      }
 };
-
 const onAdvancedUpload = async (event) => {
     lesson.value.file = await event.files[0];
 }
 const removeFileFromQuestion = () => {
     lesson.value.file = null;
 } 
+const removeMCQ = (index) => {
+    mcqs.value.splice(index,1);
+}
 
 
 // const { layoutConfig, layoutState, setActiveMenuItem, onMenuToggle } = useLayout();
@@ -75,57 +84,50 @@ const removeFileFromQuestion = () => {
 
 <template>
     <div className="grid">
+        <!-- <pre>
+            {{ question }}
+        </pre> -->
         <Toast />
         <div className="col-12">
             <div className="card">
               <ProgressBar v-if="loading" mode="indeterminate" style="height: 6px"></ProgressBar>
                 <h4>{{pageTitle}}</h4>
-                <form @submit.prevent="saveLesson" class="flex flex-column gap-2">
+                <form @submit.prevent="saveQuestion" class="flex flex-column gap-2">
                 <div class="grid">
                     <div class="col-8">
                         <div class="mb-3 gap-2 w-100">
                             <label for="username" class="p-sr-only">Title</label>
-                            <InputText v-model="lesson.title" id="username" placeholder="Title" class="w-full" />
+                            <InputText v-model="question.title" id="username" placeholder="Title" class="w-full" />
                         </div>
+
+                        <div class="mb-4 gap-2 w-100 hidden">
+                            <Editor  v-model="question.description" editorStyle="height: 320px" />
+                        </div>
+ 
+
                         <div class="mb-3 gap-2 w-100 hidden">
                             <label for="Content" class="p-sr-only">Content</label>
-                            <Textarea v-model="lesson.excerpt" id="Content" autoResize placeholder="Content" class="w-full" rows="6" cols="30" />
+                            <Textarea v-model="question.excerpt" id="Content" autoResize placeholder="Content" class="w-full" rows="6" cols="30" />
                         </div>
-                        <div class="my-4 hidden">  
+                        <div class="my-4">  
                         
-                        <label class="block font-semibold text-900 text-lg mb-3 hidden" block>Question Type</label>
-                        <div class="flex flex-wrap gap-3 hidden">
-                            <div class="flex align-items-center">
-                                <RadioButton v-model="lesson.type" inputId="ingredient1" name="pizza" value="confirmation" @change="handleQuestionType($event)"/>
-                                <label for="ingredient1" class="ml-2">Confirmation</label>
-                            </div>
-                            <div class="flex align-items-center">
-                                <RadioButton v-model="lesson.type" inputId="ingredient2" name="pizza" value="answer_and_reference" @change="handleQuestionType($event)"/>
-                                <label for="ingredient2" class="ml-2">Answer and Reference</label>
-                            </div>
-                            <div class="flex align-items-center">
-                                <RadioButton v-model="lesson.type" inputId="ingredient3" name="pizza" value="mcqs" @change="handleQuestionType($event)"/>
-                                <label for="ingredient3" class="ml-2">Multiple Choice Questions</label>
+                        <label class="block font-semibold text-900 text-lg mb-3" block>Question Type</label>
+                        <div class="flex flex-wrap gap-3" v-if="questionTypes">
+                            <div class="flex align-items-center"  v-for="(type,index) in questionTypes">
+                                <RadioButton v-model="question.type" :inputId="'question-type'+index" :name="'question-type'+index" :value="type.id" @change="handleQuestionType($event)"/>
+                                <label :for="'question-type'+index" class="ml-2">{{type.title}}</label>
                             </div>
                         </div>
                        </div>
 
-                        <div class="mb-4 gap-2 w-100">
-                            <Editor  v-model="lesson.description" editorStyle="height: 320px" />
-                        </div>
-
-
-                        <FileUpload name="demo[]" :showUploadButton="false" :showCancelButton="false" :fileLimit="1" @remove="removeFileFromQuestion()" @select="onAdvancedUpload($event)"  accept="image/*" :maxFileSize="1000000">
-                            <template #empty>
-                                <p>Drag and drop files to here to upload.</p>
-                            </template>
-                        </FileUpload>
-
-                        <div class="mcqs hidden">
-                            <span class="block font-semibold text-900 text-lg mb-3 mt-4" block>Add Multiple Choice Questions</span>
+                        <div class="mcqs" v-if="question.type == 3">
+                            <span class="block font-semibold text-900 text-lg mb-3 mt-4 flex">
+                                <h5 class="mb-2 mt-3">Add Multiple Choice Questions</h5>
+                            </span>
                             <div class="grid">
                                 <div class="col-12">
-                                  <div class="mcqs_question" v-for="mcq in mcqs">
+                                  <div class="mcqs_question" v-for="(mcq,index) in mcqs">
+                                      <span class="p-button-rounded mb-3 ml-auto pi pi-times block" @click="removeMCQ(index)" style="display:table"></span>
                                         <div class="mb-3">
                                         <label for="username" class="p-sr-only">Title</label>
                                         <InputText v-model="mcq.question" id="username" placeholder="Question" class="w-full" />
@@ -145,6 +147,12 @@ const removeFileFromQuestion = () => {
                                 </div>
                             </div>
                         </div>
+
+                        <FileUpload name="demo[]" :showUploadButton="false" :showCancelButton="false" :fileLimit="1" @remove="removeFileFromQuestion()" @select="onAdvancedUpload($event)"  accept="image/*" :maxFileSize="1000000">
+                            <template #empty>
+                                <p>Drag and drop files to here to upload.</p>
+                            </template>
+                        </FileUpload>
                 </div>
 
                 <div class="col-4">
@@ -190,8 +198,8 @@ const removeFileFromQuestion = () => {
                         <button class="p-button p-component p-button-primary flex-1" type="submit" aria-label="Publish" >
                             <!---->
                             <span class="pi pi-fw pi-check p-button-icon p-button-icon-left"></span>
-                            <span class="p-button-label" v-if="!route.query.lessonId">Publish</span>
-                            <span class="p-button-label" v-else>Update</span>
+                            <span class="p-button-label" v-if="!lessonId && edit">Update</span>
+                            <span class="p-button-label" v-else>Publish</span>
                             <!---->
                             <span class="p-ink" role="presentation" aria-hidden="true"></span>
                         </button>
@@ -218,3 +226,6 @@ const removeFileFromQuestion = () => {
     margin-bottom: 11px;
 }
 </style>
+
+
+<!-- $2y$10$nJA60PKs0YNHK9WY/g/CCeHwc5OcGYMTP31NDVEw3Hma6EFq6tO5W -->
