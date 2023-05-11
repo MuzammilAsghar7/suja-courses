@@ -16,7 +16,8 @@ const model = ref([
         label: 'Questions',
         items: [
             { label: 'All Questions', icon: 'pi pi-fw pi-book', to: '/questions' },
-            { label: 'Question Types', icon: 'pi pi-fw pi-id-card', to: '/question-types' }
+            { label: 'Question Types', icon: 'pi pi-fw pi-id-card', to: '/question-types' },
+            { label: 'Options', icon: 'pi pi-fw pi-id-card', to: '/options' }
         ]
     },
     {
