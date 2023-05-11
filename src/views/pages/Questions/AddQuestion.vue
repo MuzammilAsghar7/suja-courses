@@ -22,7 +22,7 @@ var mcqs = ref([{ question : '',answerOptions:[]}]);
 const selectedCountry = ref();
 const pageTitle = ref('Add a new Question');
 const loading = ref(true); 
-const question = ref({status:1,lesson_id:lessonId});
+const question = ref({status:1,lesson_id:lessonId, mcqs:mcqs.value});
 // import { useLayout } from '@/layout/composables/layout';
 const questionService = new QuestionService();
 onMounted(()=>{
@@ -55,18 +55,20 @@ const saveQuestion = () => {
             loading.value=false;  
             toast.add({ severity: 'success', summary: 'Updated', detail: 'Question has been updated Successfully.', life: 3000 });
         });
-    }else{
+    }
+    else{
         questionService.addQuestion(question.value).then((response) => { 
-            if(response.status){
-               toast.add({ severity: 'success', summary: 'Added', detail: 'Question has been added Successfully.', life: 3000 })
-            }else
-            {
-                response.errors.forEach((error) => {
-                    toast.add({ severity: 'error', summary: 'Error', detail: error.error, life: 3000 })
-                })
-            }
+            console.log(response)
+            // if(response.status){
+            //    toast.add({ severity: 'success', summary: 'Added', detail: 'Question has been added Successfully.', life: 3000 })
+            // }else
+            // {
+            //     response.errors.forEach((error) => {
+            //         toast.add({ severity: 'error', summary: 'Error', detail: error.error, life: 3000 })
+            //     })
+            // }
         })
-     }
+    }
 };
 const onAdvancedUpload = async (event) => {
     lesson.value.file = await event.files[0];
@@ -84,9 +86,9 @@ const removeMCQ = (index) => {
 
 <template>
     <div className="grid">
-        <!-- <pre>
+        <pre>
             {{ question }}
-        </pre> -->
+        </pre>
         <Toast />
         <div className="col-12">
             <div className="card">
@@ -130,10 +132,11 @@ const removeMCQ = (index) => {
                                       <span class="p-button-rounded mb-3 ml-auto pi pi-times block" @click="removeMCQ(index)" style="display:table"></span>
                                         <div class="mb-3">
                                         <label for="username" class="p-sr-only">Title</label>
-                                        <InputText v-model="mcq.question" id="username" placeholder="Question" class="w-full" />
+                                            <InputText v-model="mcq.question" id="username" placeholder="Question" class="w-full" />
                                         </div>
                                         <div class="mb-3">
-                                            <Chips v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" />
+                                            <!-- <Chips v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" /> -->
+                                            <InputText v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" />
                                         </div>
                                         <Divider />
                                     </div>
