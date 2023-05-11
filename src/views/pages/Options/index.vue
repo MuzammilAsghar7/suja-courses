@@ -93,10 +93,13 @@ const confirmDeleteProduct = (editProduct) => {
 };
 
 const deleteProduct = () => {
-    products.value = products.value.filter((val) => val.id !== product.value.id);
-    deleteProductDialog.value = false;
-    product.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+    productService.deleteOption(product.value.id).then((response) => { 
+        console.log(response)
+        if(response.status){
+            toast.add({ severity: 'success', summary: 'Option Delete Successfully.', detail: 'Message Content', life: 3000 });
+            deleteProductDialog.value = false;
+        }
+    });
 };
 
 const findIndexById = (id) => {
@@ -168,10 +171,7 @@ const initFilters = () => {
                 
                     <Column  headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <router-link  :to="'/chapters/'+slotProps.data.id+'/lessons'">
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-success mr-2" />
-                            </router-link>
-                            <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" /> -->
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
                     </Column>
                 </DataTable>

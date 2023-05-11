@@ -33,6 +33,16 @@ export default class ProductService {
           });
      }
 
+    deleteOption(id) {
+        return axios.post('/delete-option', {
+            id,
+        })
+        .then((res) => res.data)
+        .catch(function (error) {
+            error;
+        });
+    }
+
     getoptions() {
         return axios.get('/options')
          .then((res) => res.data)
