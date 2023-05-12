@@ -36,6 +36,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/Questions/AddQuestion.vue')
                 },
                 {
+                    path: '/options',
+                    name: 'options',
+                    component: () => import('@/views/pages/Options/index.vue')
+                },
+                {
                     path: '/add-lesson/',
                     name: 'add-lesson',
                     component: () => import('@/views/pages/Questions/AddLesson.vue')

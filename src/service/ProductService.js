@@ -23,6 +23,24 @@ export default class ProductService {
           });
      }
 
+     addOption(title) {
+        return axios.post('/create-option', {
+            title,
+          })
+          .then((res) => res.data)
+          .catch(function (error) {
+            error;
+          });
+     }
+
+    getoptions() {
+        return axios.get('/options')
+         .then((res) => res.data)
+         .catch(function (error) {
+              error;
+         });
+    }
+
     getModules() {
         return axios.get('/modules')
          .then((res) => res.data)
