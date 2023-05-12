@@ -6,11 +6,22 @@ import Editor from 'primevue/editor';
 import { ref,onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import QuestionService from '@/service/QuestionService.js';
+import ProductService from '@/service/ProductService.js';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useStore } from 'vuex';
+import { useField, useForm } from 'vee-validate';
+const { value, errorMessage } = useField('selectedCountry', validateField);
 const route = useRoute();
 const store = useStore();
 const toast = useToast();
+
+function validateField(selectedCountry) {
+    if (!selectedCountry) {
+        return 'Value is required.';
+    }
+
+    return true;
+}
 
 const lessons = computed(() =>  store.state.lessons )
 const configs = computed(() =>  store.state.global.config )
@@ -18,13 +29,16 @@ const questionTypes = computed(() => store.getters.questionTypes)
 let lessonId = route.query.lessonId;
 let chapterId = route.query.chapterId;
 let edit = route.query.edit;
-var mcqs = ref([{ question : '',answerOptions:[]}]);
-const selectedCountry = ref();
+var mcqs = ref([{ options : '', answerOptions:false}]);
+const selectedCountry = ref('');
 const pageTitle = ref('Add a new Question');
 const loading = ref(true); 
-const question = ref({status:1,lesson_id:lessonId, mcqs:mcqs.value});
+const options = ref([]); 
+const selectedmcqs = ref();
+const question = ref({status:1,lesson_id:lessonId});
 // import { useLayout } from '@/layout/composables/layout';
 const questionService = new QuestionService();
+const productService = new ProductService();
 onMounted(()=>{
     if(edit){
         pageTitle.value = "Edit lesson"
@@ -33,6 +47,7 @@ onMounted(()=>{
     {
         loading.value=false
     }
+    productService.getoptions().then((data) => { mcqs.value = data });
 })
 
 // action methods
@@ -42,31 +57,62 @@ const handleQuestionType = (event) => {
     //     question.mcqs = []
     // }
 }
+
+const selectedfalse = (index) => {
+    
+    selectedmcqs.value.forEach((element, index2) => {
+        if(index2 == index){
+            selectedmcqs.value[index2].status = true
+        } else{
+            selectedmcqs.value[index2].status = false
+        }
+    });
+
+    console.log(selectedmcqs.value)
+}
+
 const addMoreQuestion = () => {
     let inx  = mcqs.value.length;
     mcqs.value[inx] = { lesson : '',answerOptions:[]};
     console.log(mcqs.value);
 }
 const saveQuestion = () => {
-    console.log(23232);
+    question.value.mcqs=selectedmcqs.value;
+    if(!question.value.type){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'select qustion type', life: 3000 })
+        return false
+    }
+    if(question.value.type == 3){
+        if(!question.value.mcqs){
+            toast.add({ severity: 'error', summary: 'Error', detail: 'select qustion option', life: 3000 })
+            return false
+        }
+
+        if(selectedCountry.value == ''){
+            toast.add({ severity: 'error', summary: 'Error', detail: 'select option', life: 3000 })
+            return false
+        }
+    }
+   
+    
     if(lessonId && edit){
-        questionService.updateQuestion(lessonId,question.value)
-        .then((data) => {
-            loading.value=false;  
-            toast.add({ severity: 'success', summary: 'Updated', detail: 'Question has been updated Successfully.', life: 3000 });
-        });
+        // questionService.updateQuestion(lessonId,question.value)
+        // .then((data) => {
+        //     loading.value=false;  
+        //     toast.add({ severity: 'success', summary: 'Updated', detail: 'Question has been updated Successfully.', life: 3000 });
+        // });
     }
     else{
         questionService.addQuestion(question.value).then((response) => { 
-            console.log(response)
-            // if(response.status){
-            //    toast.add({ severity: 'success', summary: 'Added', detail: 'Question has been added Successfully.', life: 3000 })
-            // }else
-            // {
-            //     response.errors.forEach((error) => {
-            //         toast.add({ severity: 'error', summary: 'Error', detail: error.error, life: 3000 })
-            //     })
-            // }
+            console.log(response);
+            if(response.status){
+                toast.add({ severity: 'success', summary: 'Added', detail: 'Question has been added Successfully.', life: 3000 })
+            }else
+            {
+                response.errors.forEach((error) => {
+                    toast.add({ severity: 'error', summary: 'Error', detail: error.error, life: 3000 })
+                })
+            }
         })
     }
 };
@@ -87,14 +133,15 @@ const removeMCQ = (index) => {
 <template>
     <div className="grid">
         <pre>
-            {{ question }}
+            {{ mcqs }}
+            {{ options }}
         </pre>
         <Toast />
         <div className="col-12">
             <div className="card">
               <ProgressBar v-if="loading" mode="indeterminate" style="height: 6px"></ProgressBar>
                 <h4>{{pageTitle}}</h4>
-                <form @submit.prevent="saveQuestion" class="flex flex-column gap-2">
+                <form @submit.prevent="saveQuestion" class="flex flex-column gap-2" >
                 <div class="grid">
                     <div class="col-8">
                         <div class="mb-3 gap-2 w-100">
@@ -120,6 +167,7 @@ const removeMCQ = (index) => {
                                 <label :for="'question-type'+index" class="ml-2">{{type.title}}</label>
                             </div>
                         </div>
+                        
                        </div>
 
                         <div class="mcqs" v-if="question.type == 3">
@@ -128,14 +176,21 @@ const removeMCQ = (index) => {
                             </span>
                             <div class="grid">
                                 <div class="col-12">
-                                  <div class="mcqs_question" v-for="(mcq,index) in mcqs">
+                                    <div class="mcqs_question" v-for="(mcq,index) in selectedmcqs">
+                                        <div class="flex align-items-center">
+                                            <RadioButton v-model="selectedCountry" :inputId="'select_'+index" name="pizza" @change="selectedfalse(index)" :value="mcq.name"/>
+                                            <label :for="'select_'+index" class="ml-2">{{ mcq.name }}</label>
+                                        </div>
+                                    </div>
+                                    <small id="text-error" class="p-error">{{ errorMessage || '&nbsp;' }}</small>
+                                  <!-- <div class="mcqs_question" v-for="(mcq,index) in mcqs">
                                       <span class="p-button-rounded mb-3 ml-auto pi pi-times block" @click="removeMCQ(index)" style="display:table"></span>
                                         <div class="mb-3">
                                         <label for="username" class="p-sr-only">Title</label>
                                             <InputText v-model="mcq.question" id="username" placeholder="Question" class="w-full" />
                                         </div>
                                         <div class="mb-3">
-                                            <!-- <Chips v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" /> -->
+                                            <Chips v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" />
                                             <InputText v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" />
                                         </div>
                                         <Divider />
@@ -145,17 +200,17 @@ const removeMCQ = (index) => {
                                         <span class="pi pi-fw pi-check p-button-icon p-button-icon-left"></span>
                                         <span class="p-button-label">Add</span>
                                         <span class="p-ink" role="presentation" aria-hidden="true"></span>
-                                    </button>
+                                    </button> -->
 
                                 </div>
                             </div>
                         </div>
 
-                        <FileUpload name="demo[]" :showUploadButton="false" :showCancelButton="false" :fileLimit="1" @remove="removeFileFromQuestion()" @select="onAdvancedUpload($event)"  accept="image/*" :maxFileSize="1000000">
+                        <!-- <FileUpload name="demo[]" :showUploadButton="false" :showCancelButton="false" :fileLimit="1" @remove="removeFileFromQuestion()" @select="onAdvancedUpload($event)"  accept="image/*" :maxFileSize="1000000">
                             <template #empty>
                                 <p>Drag and drop files to here to upload.</p>
                             </template>
-                        </FileUpload>
+                        </FileUpload> -->
                 </div>
 
                 <div class="col-4">
@@ -207,7 +262,10 @@ const removeMCQ = (index) => {
                             <span class="p-ink" role="presentation" aria-hidden="true"></span>
                         </button>
                         </div>
+                        <MultiSelect v-model="selectedmcqs" display="chip" :options="mcqs" optionLabel="name" placeholder="Select Options"
+                    :maxSelectedLabels="3" class="w-full mt-4" />
                     </div>
+                    
                 </div>
                 </form>
             </div>
