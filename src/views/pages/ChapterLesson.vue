@@ -10,7 +10,7 @@ import { useRoute } from 'vue-router';
 const toast = useToast();
 const { contextPath } = useLayout();
 const route = useRoute();
-const chapterID =  route.params.id;
+const chapterId =  route.params.id;
 
 const products = ref(null);
 const productDialog = ref(false);
@@ -32,8 +32,8 @@ onBeforeMount(() => {
     initFilters();
 });
 onMounted(async () => {
-    console.log(chapterID);
-    lessonService.getAllLessons(chapterID).then((data) => { questions.value = data.data; console.log(data)});
+    console.log(chapterId);
+    lessonService.getAllLessons(chapterId).then((data) => { questions.value = data.data; console.log(data)});
 });
 
 const exportCSV = () => {
@@ -58,7 +58,7 @@ const initFilters = () => {
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
-                            <RouterLink :to="{ path: '/add-lesson', query: { chapterId:chapterID }}">
+                            <RouterLink :to="{ path: '/add-lesson', query: { chapterId }}">
                                <Button label="New Lesson" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
                             </RouterLink>
                             <!-- <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" /> -->
@@ -104,7 +104,9 @@ const initFilters = () => {
 
                  <Column header="Questions">
                     <template #body="slotProps">
-                        <Button type="button" label="Questions" badge="8" class="p-button-warning" />
+                        <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}">
+                           <Button type="button" label="Questions" badge="8" class="p-button-warning" />
+                        </RouterLink>
                     </template>
                  </Column>
 

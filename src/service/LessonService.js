@@ -1,16 +1,6 @@
 import axios from "axios";
 export default class QuestionService {
 
-    getQuestions(courseId) {
-       console.log(courseId);
-       return false;
-       return axios.get('/courses')
-        .then((res) => res.data)
-        .catch(function (error) {
-             error;
-        });
-    }
-
     getAllLessons(chapterId) {
       return axios.get(`/chapters/${chapterId}/lessons`)
        .then((res) => res.data)

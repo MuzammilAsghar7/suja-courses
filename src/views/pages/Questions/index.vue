@@ -1,12 +1,15 @@
 <script setup>
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
-import LessonService from '@/service/LessonService.js';
+import QuestionService from '@/service/QuestionService.js';
 import { useToast } from 'primevue/usetoast';
 import { useLayout } from '@/layout/composables/layout';
+import { useRoute,useRouter } from 'vue-router';
 import axios from 'axios';
+import router from '../../../router';
 
 const toast = useToast();
+const route = useRoute();
 const { contextPath } = useLayout();
 
 const products = ref(null);
@@ -23,13 +26,19 @@ const courseStatuses = ref([
     { label: 'DISABLE', value: "0" },
 ]);
 
+let lessonId = route.query.lessonId;
+let chapterId = route.query.chapterId;
+
 const questions = ref(null);
-const lessonService = new LessonService();
+const questionService = new QuestionService();
 onBeforeMount(() => {
     initFilters();
 });
 onMounted(async () => {
-    lessonService.getAllQuestions().then((data) => { questions.value = data.questions});
+    if(!lessonId || !chapterId){
+        router.push('/');
+    }
+    questionService.getAllQuestions({lessonId,chapterId}).then((data) => { questions.value = data.questions});
 });
 
 const exportCSV = () => {
@@ -48,8 +57,8 @@ const initFilters = () => {
         <div class="col-12">
             <div class="card">
                 <!-- <pre>
-                {{ questions }}
-            </pre> -->
+                    {{ questions }}
+                </pre> -->
                 <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
@@ -82,10 +91,11 @@ const initFilters = () => {
                 </template>
                 <Column field="id" header="ID">
                     <template #body="slotProps">
-                        <span class="font-bold pl-4">{{ slotProps.data.id }}</span>
+                        <span class="font-bold pl-4">
+                            {{ slotProps.data.id }}</span>
                     </template>
                 </Column>
-                <Column field="name" header="Title" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                <Column field="title" header="Title" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                     <template #body="slotProps">
                         <span class="p-column-title">Title</span>
                         <h5>{{ slotProps.data.title }}</h5>
@@ -105,17 +115,17 @@ const initFilters = () => {
                 </Column>
                 <Column field="content" header="Content">
                     <template #body="slotProps">
-                        <div class="py-3"
+                        <div class="py-3" v-if="slotProps.data.content"
                         v-html="slotProps.data.content.substring(0, 160)+' ...'"></div>
                     </template>
                  </Column>
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <router-link  :to="{ path: 'add-question', query: { questionId:slotProps.data.id  }}">
+                            <router-link  :to="{ path: 'add-question', query: { questionId:slotProps.data.id,lessonId,edit:true  }}">
                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" />
                             </router-link>
-                            <router-link  to="add-question">
+                            <router-link :to="{ path: 'add-question', query: { lessonId  }}">
                                <Button icon="pi pi-plus" class="p-button-rounded p-button-success mr-2" />
                             </router-link>
                             <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" /> -->

@@ -27,6 +27,7 @@ const lessons = computed(() =>  store.state.lessons )
 const configs = computed(() =>  store.state.global.config )
 const questionTypes = computed(() => store.getters.questionTypes)
 let lessonId = route.query.lessonId;
+let questionId = route.query.questionId;
 let chapterId = route.query.chapterId;
 let edit = route.query.edit;
 var mcqs = ref([{ options : '', answerOptions:false}]);
@@ -41,8 +42,9 @@ const questionService = new QuestionService();
 const productService = new ProductService();
 onMounted(()=>{
     if(edit){
+        console.log('edit is here')
         pageTitle.value = "Edit lesson"
-        questionService.getQuestion(lessonId).then((data) => { question.value = data.data; console.log(data); loading.value=false});
+        questionService.getQuestion(questionId).then((data) => { question.value = data.question; console.log(data); loading.value=false});
     }else
     {
         loading.value=false
@@ -133,8 +135,7 @@ const removeMCQ = (index) => {
 <template>
     <div className="grid">
         <pre>
-            {{ mcqs }}
-            {{ options }}
+            {{ question }}
         </pre>
         <Toast />
         <div className="col-12">
