@@ -1,6 +1,6 @@
 <script setup>
 // import { ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import { computed } from 'vue';
 import Editor from 'primevue/editor';
 import { ref,onMounted } from 'vue';
@@ -11,6 +11,7 @@ import { useStore } from 'vuex';
 const route = useRoute();
 const store = useStore();
 const toast = useToast();
+const router = useRouter();
 
 const lessons = computed(() =>  store.state.lessons )
 let lessonId = route.query.lessonId;
@@ -40,7 +41,6 @@ onMounted(()=>{
     if(edit){
         pageTitle.value = "Edit lesson"
         lessonService.getLesson(lessonId).then((data) => { lesson.value = data.data; console.log(data); loading.value=false});
-        console.log('eewe')
     }else
     {
         loading.value=false
@@ -67,11 +67,13 @@ const saveLesson = () => {
         .then((data) => { 
             loading.value=false;  
             toast.add({ severity: 'success', summary: 'Updated', detail: 'Lesson has been updated Successfully.', life: 3000 });
+            router.push(`/chapters/${chapterId}/lessons`);
         });
     }else{
-        console.log('add lesson')
         lessonService.addLesson(lesson.value).then((response) => { 
             toast.add({ severity: 'success', summary: 'Added', detail: 'Lesson has been added Successfully.', life: 3000 })
+            router.push(`/chapters/${chapterId}/lessons`);
+            // router.push({path: '/add-lesson',query: {chapterId:chapterId}})
         })
      }
 };

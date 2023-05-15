@@ -1,12 +1,15 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
+import { useRoute,useRouter } from 'vue-router';
 import AppConfig from '@/layout/AppConfig.vue';
 import AuthService from '@/service/AuthService.js';
 import { useToast } from 'primevue/usetoast';
 
 const { layoutConfig, contextPath } = useLayout();
 const toast = useToast();
+const router = useRouter();
+
 const email = ref('');
 const password = ref('');
 const checked = ref(false);
@@ -31,6 +34,7 @@ const handleAuthentcation = () => {
             localStorage.setItem('user',JSON.stringify(data.user));
             localStorage.setItem('token',data.user.token);
             toast.add({ severity: 'success', summary: 'Success', detail: 'Logged in sccessfully!', life: 3000 });
+            router.push('/');
         }else{
             toast.add({ severity: 'error', summary: 'Error', detail: 'Invalid Credentials', life: 3000 });
         }
