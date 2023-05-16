@@ -18,6 +18,7 @@ const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const product = ref({});
 const selectedProducts = ref(null);
+const loading = ref(true)
 const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
@@ -38,7 +39,7 @@ onMounted(async () => {
     if(!lessonId || !chapterId){
         router.push('/');
     }
-    questionService.getAllQuestions({lessonId,chapterId}).then((data) => { questions.value = data.questions});
+    questionService.getAllQuestions({lessonId,chapterId}).then((data) => { questions.value = data.questions; loading.value=false; });
 });
 
 const exportCSV = () => {
@@ -69,16 +70,15 @@ const initFilters = () => {
                             <!-- <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" /> -->
                         </div>
                     </template>
-
-                    <template v-slot:end>
-                        <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" />
-                        <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
-                    </template>
                 </Toolbar>
 
                 <DataTable
                     ref="dt"
                     :value="questions"
+                    :loading="loading"
+                    paginator 
+                    :rows="5" 
+                    :rowsPerPageOptions="[5, 10, 20, 50]"
                 >
                 <template #header>
                     <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
@@ -89,6 +89,39 @@ const initFilters = () => {
                         </span>
                     </div>
                 </template>
+                <template #loading>
+                    <div class="bg-white h-full w-full">
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                </div>
+                </template>
+
                 <Column field="id" header="ID">
                     <template #body="slotProps">
                         <span class="font-bold pl-4">
