@@ -30,12 +30,12 @@ let lessonId = route.query.lessonId;
 let questionId = route.query.questionId;
 let chapterId = route.query.chapterId;
 let edit = route.query.edit;
-var mcqs = ref([{ options : '', answerOptions:false}]);
+var mcqs = ref([{ status : false, answerOption:''}]);
 const selectedCountry = ref('');
 const pageTitle = ref('Add a new Question');
 const loading = ref(true); 
 const options = ref([]); 
-const selectedmcqs = ref([]);
+const selectedmcqs = ref();
 const question = ref({status:1,lesson_id:lessonId});
 // import { useLayout } from '@/layout/composables/layout';
 const questionService = new QuestionService();
@@ -48,16 +48,15 @@ onMounted(()=>{
             question.value = data.question; 
             // console.log(data.question.selectedmcqs); 
             loading.value=false;
-            if(data.question.selectedmcqs){
-                selectedmcqs.value = data.question.selectedmcqs;
-            }
+            // if(data.question.selectedmcqs){
+            //     selectedmcqs.value = data.question.selectedmcqs;
+            // }
         });
-
     }else
     {
         loading.value=false
     }
-    productService.getoptions().then((data) => { mcqs.value = data });
+    // productService.getoptions().then((data) => { mcqs.value = data });
 })
 
 // action methods
@@ -70,11 +69,11 @@ const handleQuestionType = (event) => {
 
 const selectedfalse = (index) => {
     
-    selectedmcqs.value.forEach((element, index2) => {
+    mcqs.value.forEach((element, index2) => {
         if(index2 == index){
-            selectedmcqs.value[index2].use = true
+            mcqs.value[index2].status = true
         } else{
-            selectedmcqs.value[index2].use = false
+            mcqs.value[index2].status = false
         }
     });
 
@@ -83,11 +82,12 @@ const selectedfalse = (index) => {
 
 const addMoreQuestion = () => {
     let inx  = mcqs.value.length;
-    mcqs.value[inx] = { lesson : '',answerOptions:[]};
+    mcqs.value[inx] = { status : false,answerOption:''};
     console.log(mcqs.value);
 }
 const saveQuestion = () => {
-    question.value.mcqs=selectedmcqs.value;
+    
+    question.value.mcqs=mcqs;
     if(!question.value.type){
         toast.add({ severity: 'error', summary: 'Error', detail: 'select qustion type', life: 3000 })
         return false
@@ -143,6 +143,7 @@ const removeMCQ = (index) => {
 <template>
     <div className="grid">
         <pre>
+            {{ question }}
             {{ selectedmcqs }}
             {{ selectedCountry }}
         </pre>
@@ -193,15 +194,18 @@ const removeMCQ = (index) => {
                                         </div>
                                     </div>
                                     <small id="text-error" class="p-error">{{ errorMessage || '&nbsp;' }}</small>
-                                  <!-- <div class="mcqs_question" v-for="(mcq,index) in mcqs">
+                                  <div class="mcqs_question" v-for="(mcq,index) in mcqs">
+                                    {{ mcq }}
                                       <span class="p-button-rounded mb-3 ml-auto pi pi-times block" @click="removeMCQ(index)" style="display:table"></span>
-                                        <div class="mb-3">
+                                        <!-- <div class="mb-3">
                                         <label for="username" class="p-sr-only">Title</label>
                                             <InputText v-model="mcq.question" id="username" placeholder="Question" class="w-full" />
-                                        </div>
+                                        </div> -->
                                         <div class="mb-3">
-                                            <Chips v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" />
-                                            <InputText v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" />
+                                            <InputText v-model="mcq.answerOption" placeholder="Answer Option" class="w-full" />
+                                            <RadioButton v-if="mcq.answerOption" v-model="selectedCountry" :inputId="'select_'+index" name="pizza" @change="selectedfalse(index)" :value="mcq.answerOption"/>
+                                            <label v-if="mcq.answerOption" :for="'select_'+index" class="ml-2">{{ mcq.name }}</label>
+                                            <!-- <InputText v-model="mcq.answerOptions" placeholder="Answer Options" class="w-full" /> -->
                                         </div>
                                         <Divider />
                                     </div>
@@ -210,7 +214,7 @@ const removeMCQ = (index) => {
                                         <span class="pi pi-fw pi-check p-button-icon p-button-icon-left"></span>
                                         <span class="p-button-label">Add</span>
                                         <span class="p-ink" role="presentation" aria-hidden="true"></span>
-                                    </button> -->
+                                    </button>
 
                                 </div>
                             </div>
