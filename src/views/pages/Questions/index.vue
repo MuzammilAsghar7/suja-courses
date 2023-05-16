@@ -57,9 +57,9 @@ const initFilters = () => {
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <!-- <pre>
+                <pre>
                     {{ questions }}
-                </pre> -->
+                </pre>
                 <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>

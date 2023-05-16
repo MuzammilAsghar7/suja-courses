@@ -35,7 +35,7 @@ const selectedCountry = ref('');
 const pageTitle = ref('Add a new Question');
 const loading = ref(true); 
 const options = ref([]); 
-const selectedmcqs = ref();
+const selectedmcqs = ref([]);
 const question = ref({status:1,lesson_id:lessonId});
 // import { useLayout } from '@/layout/composables/layout';
 const questionService = new QuestionService();
@@ -44,7 +44,15 @@ onMounted(()=>{
     if(edit){
         console.log('edit is here')
         pageTitle.value = "Edit lesson"
-        questionService.getQuestion(questionId).then((data) => { question.value = data.question; console.log(data); loading.value=false});
+        questionService.getQuestion(questionId).then((data) => { 
+            question.value = data.question; 
+            // console.log(data.question.selectedmcqs); 
+            loading.value=false;
+            if(data.question.selectedmcqs){
+                selectedmcqs.value = data.question.selectedmcqs;
+            }
+        });
+
     }else
     {
         loading.value=false
@@ -64,9 +72,9 @@ const selectedfalse = (index) => {
     
     selectedmcqs.value.forEach((element, index2) => {
         if(index2 == index){
-            selectedmcqs.value[index2].status = true
+            selectedmcqs.value[index2].use = true
         } else{
-            selectedmcqs.value[index2].status = false
+            selectedmcqs.value[index2].use = false
         }
     });
 
@@ -135,7 +143,8 @@ const removeMCQ = (index) => {
 <template>
     <div className="grid">
         <pre>
-            {{ question }}
+            {{ selectedmcqs }}
+            {{ selectedCountry }}
         </pre>
         <Toast />
         <div className="col-12">
