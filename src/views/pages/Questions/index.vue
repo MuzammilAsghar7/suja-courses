@@ -40,6 +40,8 @@ onMounted(async () => {
         router.push('/');
     }
     questionService.getAllQuestions({lessonId,chapterId}).then((data) => { questions.value = data.questions; loading.value=false; });
+    console.log(questions);
+    
 });
 
 const exportCSV = () => {
@@ -57,9 +59,9 @@ const initFilters = () => {
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <pre>
+                <!-- <pre>
                     {{ questions }}
-                </pre>
+                </pre> -->
                 <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>

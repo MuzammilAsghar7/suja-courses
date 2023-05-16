@@ -35,6 +35,7 @@ onBeforeMount(() => {
 onMounted(async () => {
     console.log(chapterId);
     lessonService.getAllLessons(chapterId).then((data) => { questions.value = data.data; loading.value=false;});
+    console.log(questions.value);
 });
 
 const exportCSV = () => {
@@ -71,7 +72,6 @@ const initFilters = () => {
                         <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
                     </template> -->
                 </Toolbar>
-
                 <DataTable
                     ref="dt"
                     :value="questions"
@@ -141,9 +141,10 @@ const initFilters = () => {
 
                  <Column header="Questions">
                     <template #body="slotProps">
-                        <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}">
-                           <Button type="button" label="Questions" badge="8" class="p-button-warning" />
+                        <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}" v-if="slotProps.data.questions_count > 0">
+                           <Button type="button" label="Questions" :badge="slotProps.data.questions_count" class="p-button-warning" />
                         </RouterLink>
+                        <span v-else>Not Found any question</span>
                     </template>
                  </Column>
 
