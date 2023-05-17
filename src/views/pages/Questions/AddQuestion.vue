@@ -1,6 +1,6 @@
 <script setup>
 // import { ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter} from 'vue-router';
 import { computed } from 'vue';
 import Editor from 'primevue/editor';
 import { ref,onMounted } from 'vue';
@@ -14,6 +14,7 @@ const { value, errorMessage } = useField('selectedCountry', validateField);
 const route = useRoute();
 const store = useStore();
 const toast = useToast();
+const router = useRouter();
 
 function validateField(selectedCountry) {
     if (!selectedCountry) {
@@ -120,6 +121,8 @@ const saveQuestion = () => {
         questionService.addQuestion(question.value).then((response) => { 
             if(response.status){
                 toast.add({ severity: 'success', summary: 'Added', detail: 'Question has been added Successfully.', life: 3000 })
+                router.push(`/chapters/${chapterId}/lessons`);
+
             }else
             {
                 response.errors.forEach((error) => {
