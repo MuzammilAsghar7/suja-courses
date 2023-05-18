@@ -124,13 +124,7 @@ const initFilters = () => {
                 </div>
                 </template>
 
-                <Column field="id" header="ID">
-                    <template #body="slotProps">
-                        <span class="font-bold pl-4">
-                            {{ slotProps.data.id }}</span>
-                    </template>
-                </Column>
-                <Column field="title" header="Title" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                <Column field="title" style="width: 50%" header="Title" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                     <template #body="slotProps">
                         <span class="p-column-title">Title</span>
                         <h5>{{ slotProps.data.title }}</h5>
@@ -142,18 +136,6 @@ const initFilters = () => {
                         <span :class="'product-badge status-' + (slotProps.data.status == 1 ? 'Enabled' : 'Disabled')">{{ slotProps.data.status == 1 ? "Enabled" : 'Disabled' }}</span>
                     </template>
                 </Column>
-                <Column field="status" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Add Question</span>
-                        <span :class="'product-badge status-' + (slotProps.data.status == 1 ? 'Enabled' : 'Disabled')">{{ slotProps.data.status == 1 ? "Enabled" : 'Disabled' }}</span>
-                    </template>
-                </Column>
-                <Column field="content" header="Content">
-                    <template #body="slotProps">
-                        <div class="py-3" v-if="slotProps.data.content"
-                        v-html="slotProps.data.content.substring(0, 160)+' ...'"></div>
-                    </template>
-                 </Column>
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">

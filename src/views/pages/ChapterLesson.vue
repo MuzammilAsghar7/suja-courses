@@ -121,12 +121,7 @@ const initFilters = () => {
                         </div>
                     </div>
                     </template>
-                    <Column field="id" header="ID">
-                        <template #body="slotProps">
-                            <span class="font-bold pl-4">{{ slotProps.data.id }}</span>
-                        </template>
-                    </Column>
-                    <Column field="name" header="Title" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="name" header="Title" style="width: 40%" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Title</span>
                             <h5>{{ slotProps.data.title }}</h5>

@@ -130,14 +130,17 @@ const initFilters = () => {
                     :value="courses"
                 >
 
-                <Column field="id" header="ID"></Column>
                 <Column field="name" header="Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                     <template #body="slotProps">
                         <span class="p-column-title">Title</span>
                         {{ slotProps.data.title }}
                     </template>
                 </Column>
-                <Column field="icon" header="Icon"></Column>
+                <Column field="icon" header="Icon">
+                    <template #body="slotProps">
+                          <i :class="'fa '+slotProps.data.icon"></i>
+                    </template>
+                </Column>
                 <Column field="status" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                     <template #body="slotProps">
                         <span class="p-column-title">Status</span>
