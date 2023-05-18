@@ -120,7 +120,6 @@ const initFilters = () => {
                     <template v-slot:start>
                         <div class="my-2">
                             <Button label="New Chapter" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
-                            <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                         </div>
                     </template>
                 </Toolbar>

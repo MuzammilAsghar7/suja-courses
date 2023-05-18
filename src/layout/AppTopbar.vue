@@ -63,7 +63,7 @@ const isOutsideClicked = (event) => {
 
 <template>
     <div class="layout-topbar">
-        <router-link to="/" class="layout-topbar-logo">
+        <router-link to="/chapters" class="layout-topbar-logo">
             <img :src="logoUrl" alt="logo" />
             <!-- <span>ADI Course</span> -->
         </router-link>
@@ -76,7 +76,7 @@ const isOutsideClicked = (event) => {
             <i class="pi pi-ellipsis-v"></i>
         </button>
 
-        <div class="layout-topbar-menu" :class="topbarMenuClasses">
+        <!-- <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
@@ -89,6 +89,6 @@ const isOutsideClicked = (event) => {
                 <i class="pi pi-cog"></i>
                 <span>Settings</span>
             </button>
-        </div>
+        </div> -->
     </div>
 </template>
