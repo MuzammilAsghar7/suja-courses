@@ -17,18 +17,36 @@ export default class QuestionService {
      });
     }
 
-    updateLesson(id,payload) {
-      return axios.put('/lessons/'+id,payload)
+    updateLesson(id,lesson) {
+      var fileData = new FormData();
+      fileData.append('file', lesson.file);
+
+      return axios.post('/lessons/'+id,{
+        ...lesson,
+        fileData
+      },{
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+    })
       .then((res) => res.data)
       .catch(function (error) {
             error;
       });
     }
 
+    deleteMediaItem(id){
+     return axios.post('/delete-media-item/'+id)
+     .then((res) => res.data)
+     .catch(function (error) {
+         console.log(error)
+       });
+  }
+
      addLesson(lesson){
          var fileData = new FormData();
          fileData.append('file', lesson.file);
-         console.log(lesson);
+
         return axios.post('/add-lesson', {
             ...lesson,
             fileData

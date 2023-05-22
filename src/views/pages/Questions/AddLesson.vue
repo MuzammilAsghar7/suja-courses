@@ -35,12 +35,31 @@ const countries = ref([
 ]);
 
 const lesson = ref({status:1,chapter_id:chapterId});
+
+let isImgUrl = (url) => {
+  return /\.(jpg|jpeg|png|webp|avif|gif)$/.test(url)
+}
+
 // import { useLayout } from '@/layout/composables/layout';
 const lessonService = new LessonService();
 onMounted(()=>{
     if(edit){
         pageTitle.value = "Edit lesson"
-        lessonService.getLesson(lessonId).then((data) => { lesson.value = data.data; console.log(data); loading.value=false});
+        lessonService.getLesson(lessonId).then((data) => { 
+            lesson.value = data.data; 
+            // console.log(data.data.lessonimage); 
+            // if(data.data.lessonimage){
+            //     const lessonImgVar = fetch(data.data.lessonimage,{mode:'no-cors'})
+            //     const blob = lessonImgVar.blob()
+            //     const lessonImg = new File([blob], media.file_name, { type: '' })
+            // }
+            loading.value=false
+        });
+
+        // console.log(lesson.value)
+        // const response = fetch(media.original_url)
+        // const blob = response.blob()
+        // this.filledMetas[startprop].meta[mainprop][innerprop][innerpropvalue] = new File([blob], media.file_name, { type: 'image/*' })
     }else
     {
         loading.value=false
@@ -62,7 +81,6 @@ const addMoreQuestion = () => {
 
 const saveLesson = () => {
     if(lessonId){
-        console.log(lesson.value)
         lessonService.updateLesson(lessonId,lesson.value)
         .then((data) => { 
             loading.value=false;  
@@ -77,6 +95,13 @@ const saveLesson = () => {
         })
      }
 };
+
+const deletMedia = (id) => {
+    lessonService.deleteMediaItem(id).then((response) => { 
+        lesson.value.lessonimage = '';
+        toast.add({ severity: 'success', summary: 'Added', detail: 'Lesson has been added Successfully.', life: 3000 })
+    })
+}
 
 const onAdvancedUpload = async (event) => {
     lesson.value.file = await event.files[0];
@@ -147,9 +172,18 @@ const removeFileFromQuestion = () => {
                             </Dropdown>
                         </div>
                         </div>
-
-
-                        <FileUpload name="demo[]" :showUploadButton="false" :showCancelButton="false" :fileLimit="1" @remove="removeFileFromQuestion()" @select="onAdvancedUpload($event)"  accept="image/*" :maxFileSize="1000000">
+                        
+                        <div class="media-wrap relative mb-3" v-if="lesson.lessonimage">
+                        <Button icon="pi pi-trash" class="p-button-rounded mr-2 mb-2 z-2 absolute right-0" @click="deletMedia(lessonId)"/>
+                        
+                        <img v-if="isImgUrl(lesson.lessonimage)" :src="lesson.lessonimage">
+                        <video v-else width="320" height="240" class="w-full" controls>
+                            <source :src="lesson.lessonimage" type="video/mp4">
+                            <source :src="lesson.lessonimage" type="video/ogg">
+                            Your browser does not support the video tag.
+                        </video>
+                        </div>
+                        <FileUpload name="demo[]" :uploadedFiles="true" :showUploadButton="false" :showCancelButton="true" :fileLimit="1" @remove="removeFileFromQuestion()" @select="onAdvancedUpload($event)"  accept="" :maxFileSize="20000000">
                             <template #empty>
                                 <p>Drag and drop files to here to upload.</p>
                             </template>

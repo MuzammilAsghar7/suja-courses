@@ -153,7 +153,7 @@ const initFilters = () => {
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <router-link  :to="{ path: '/add-lesson', query: { lessonId:slotProps.data.id,edit:true  }}">
+                            <router-link  :to="{ path: '/add-lesson', query: { lessonId:slotProps.data.id,chapterId,edit:true  }}">
                                 <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" />
                             </router-link>
                         </template>
