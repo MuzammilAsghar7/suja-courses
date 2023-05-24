@@ -253,11 +253,19 @@ const initFilters = () => {
                         </div>
                     </div>
 
-                    <div class="field">
-                        <label class="mb-3">File</label>
+                    <div class="field flex gap-3">
+                       <div >
+                        <label class="mb-1 block">File</label>
                         <div>
                             <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" accept="image/*" :maxFileSize="20000000" />
                         </div>
+                       </div>
+                       <div >
+                        <label class="mb-3 block">Parent</label>
+                        <div>
+                            <Checkbox v-model="chapter.parent" :binary="true" />
+                        </div>
+                       </div>
                     </div>
 
                     <template #footer>
