@@ -44,22 +44,33 @@ export default class QuestionService {
   }
 
      addLesson(lesson){
-         var fileData = new FormData();
-         fileData.append('file', lesson.file);
+        var fileData = new FormData();
+        fileData.append('file', lesson.file);
 
-        return axios.post('/add-lesson', {
-            ...lesson,
-            fileData
-          },{
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-        })
-        .then((res) => res.data)
-        .catch(function (error) {
-            console.log(error)
-          });
+      return axios.post('/add-lesson', {
+          ...lesson,
+          fileData
+        },{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+      })
+      .then((res) => res.data)
+      .catch(function (error) {
+          console.log(error)
+        });
      }
+     
+    addInnerLesson(lesson, lessonId){
+    return axios.post('/add-innerlesson', {
+      ...lesson,
+      lessonId
+    })
+    .then((res) => res.data)
+      .catch(function (error) {
+          console.log(error)
+      });
+    }
 
      getChapter(id){
         return axios.get('/api/chapters/'+id)

@@ -46,6 +46,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/Questions/AddLesson.vue')
                 },
                 {
+                    path: '/add-innerlesson/',
+                    name: 'add-innerlesson',
+                    component: () => import('@/views/pages/Questions/AddInnerLesson.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')
