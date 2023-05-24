@@ -129,25 +129,40 @@ const initFilters = () => {
                     </Column>
                     <Column field="status" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
+                            <span class="p-column-title">Status </span>
                             <span :class="'product-badge status-' + (slotProps.data.status == 1 ? 'Enabled' : 'Disabled')">{{ slotProps.data.status == 1 ? "Enabled" : 'Disabled' }}</span>
                         </template>
                     </Column>
 
                     <Column header="Questions">
                         <template #body="slotProps">
-                            <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}" v-if="slotProps.data.questions_count > 0">
-                            <Button type="button" label="Questions" :badge="slotProps.data.questions_count" class="p-button-warning" />
-                            </RouterLink>
-                            <span v-else>Not Found any question</span>
+                            <div v-if="slotProps.data.multiple != 1 && slotProps.data.parent == 0">
+                                <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}" v-if="slotProps.data.questions_count > 0">
+                                <Button type="button" label="Questions" :badge="slotProps.data.questions_count" class="p-button-warning" />
+                                </RouterLink>
+                                <span v-else>Not Found any question</span>
+                            </div>
+                            <div v-else-if="slotProps.data.multiple == 1">
+                                Parent
+                            </div>
+                            <div v-else-if="slotProps.data.parent != 0">
+                                {{slotProps.data.lessonname.title}}
+                            </div>
                         </template>
                     </Column>
 
                     <Column header="Add Question">
                         <template #body="slotProps">
-                            <router-link  :to="{ path: '/add-question', query: { lessonId:slotProps.data.id,chapterId  }}">
-                                <Button icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
-                            </router-link>
+                            <div v-if="slotProps.data.multiple != 1">
+                                <router-link  :to="{ path: '/add-question', query: { lessonId:slotProps.data.id,chapterId  }}">
+                                    <Button icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
+                                </router-link>
+                            </div>
+                            <div v-else>
+                                <router-link  :to="{ path: '/add-innerlesson', query: { lessonId:slotProps.data.id,chapterId  }}">
+                                    <Button icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
+                                </router-link>
+                            </div>
                         </template>
                     </Column>
 
