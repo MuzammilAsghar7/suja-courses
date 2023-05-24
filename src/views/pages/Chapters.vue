@@ -10,12 +10,10 @@ import { useStore } from 'vuex';
 const toast = useToast();
 const { contextPath } = useLayout();
 const store = useStore();
-
-const products = ref(null);
+const editCourse = ref(false);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
-const product = ref({});
+const chapter = ref({});
 const selectedProducts = ref(null);
 const dt = ref(null);
 const filters = ref({});
@@ -38,12 +36,16 @@ const icons = ref(
 
 const productService = new ProductService();
 
+const fileSelect = async (event) => {
+    console.log(await event.files[0]);
+    chapter.value.file = await event.files[0];
+}
+
 onBeforeMount(() => {
     initFilters();
 });
 onMounted(async () => {
     let preCourses = localStorage.getItem('courses');
-    productService.getProducts().then((data) => { products.value = data;});
     productService.getChapters().then((data) => {courses.value = data; store.dispatch('setLessons',data); localStorage.setItem('courses',JSON.stringify(data))});
     if(!preCourses){
         
@@ -57,7 +59,8 @@ const formatCurrency = (value) => {
 };
 
 const openNew = () => {
-    product.value = {};
+    chapter.value = {};
+    editCourse.value = false;
     submitted.value = false;
     productDialog.value = true;
 };
@@ -69,34 +72,53 @@ const hideDialog = () => {
 
 const saveProduct = () => {
     submitted.value = true;
-    console.log(product.value);
-    productService.addCourses(product.value).then((response) => { 
-        console.log(response)
-        if(response.status){
-            toast.add({ severity: 'success', summary: 'Chapter Added Successfully.', detail: 'Message Content', life: 3000 });
-        }else
-        {
-            let errorKey = Object.keys(response.error);
-            toast.add({ severity: 'error', summary: response.error[errorKey][0], detail: response.erorr, life: 3000 });
-        }
-    });
+    console.log(chapter.value);
+    if(editCourse.value){
+       
+        productService.updateCourses(chapter.value).then((response) => { 
+            if(response.status){
+                toast.add({ severity: 'success', summary: 'Chapter Added Successfully.', detail: 'Message Content', life: 3000 });
+            }else
+            {
+                let errorKey = Object.keys(response.error);
+                toast.add({ severity: 'error', summary: response.error[errorKey][0], detail: response.erorr, life: 3000 });
+            }
+        });
+
+    }else
+    {
+        productService.addCourses(chapter.value).then((response) => { 
+            if(response.status){
+                toast.add({ severity: 'success', summary: 'Chapter Added Successfully.', detail: 'Message Content', life: 3000 });
+            }else
+            {
+                let errorKey = Object.keys(response.error);
+                toast.add({ severity: 'error', summary: response.error[errorKey][0], detail: response.erorr, life: 3000 });
+            }
+        });
+    }
 };
 
-const editProduct = (editProduct) => {
-    product.value = { ...editProduct,status : { label: 'ENABLE', value: "1" } };
-    console.log(product);
+const editProduct = (Chapter) => {
+    console.log(chapter);
+    chapter.value = { 
+        ...Chapter,
+        status : { label: 'ENABLE', value: "1" },
+        icon : { name: Chapter.icon, code: Chapter.icon } 
+    };
+    editCourse.value = true;
     productDialog.value = true;
 };
 
 const confirmDeleteProduct = (editProduct) => {
-    product.value = editProduct;
+    console.log(editProduct);
+    chapter.value = editProduct;
     deleteProductDialog.value = true;
 };
 
 const deleteProduct = () => {
-    products.value = products.value.filter((val) => val.id !== product.value.id);
     deleteProductDialog.value = false;
-    product.value = {};
+    chapter.value = {};
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
 };
 
@@ -113,6 +135,9 @@ const initFilters = () => {
 
 <template>
     <div class="grid">
+        <pre>
+        {{  chapter  }}
+    </pre>
         <div class="col-12">
             <div class="card">
                 <Toast />
@@ -129,7 +154,6 @@ const initFilters = () => {
                     ref="dt"
                     :value="courses"
                 >
-
                 <Column field="name" header="Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                     <template #body="slotProps">
                         <span class="p-column-title">Title</span>
@@ -166,33 +190,32 @@ const initFilters = () => {
                             <router-link  :to="'/chapters/'+slotProps.data.id+'/lessons'">
                                <Button icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" />
                             </router-link>
-                            <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" /> -->
+                            <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" /> --> 
                         </template>
                     </Column>
                 </DataTable>
 
                 <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Add new chapter" :modal="true" class="p-fluid">
-                    <img :src="contextPath + 'demo/images/product/' + product.image" :alt="product.image" v-if="product.image" width="150" class="mt-0 mx-auto mb-5 block shadow-2" />
                     <div class="field">
                         <label for="name">Name</label>
-                        <InputText id="name" v-model.trim="product.title" required="true" autofocus :class="{ 'p-invalid': submitted && !product.title }" />
-                        <small class="p-invalid" v-if="submitted && !product.title">Name is required.</small>
+                        <InputText id="name" v-model.trim="chapter.title" required="true" autofocus :class="{ 'p-invalid': submitted && !chapter.title }" />
+                        <small class="p-invalid" v-if="submitted && !chapter.title">Name is required.</small>
                     </div>
 
                     <div class="field">
                         <label for="name">Sub Title</label>
-                        <InputText id="name" v-model.trim="product.subtitle" required="true" autofocus :class="{ 'p-invalid': submitted && !product.subtitle }" />
-                        <small class="p-invalid" v-if="submitted && !product.subtitle">Subtitle is required.</small>
+                        <InputText id="name" v-model.trim="chapter.subtitle" required="true" autofocus :class="{ 'p-invalid': submitted && !chapter.subtitle }" />
+                        <small class="p-invalid" v-if="submitted && !chapter.subtitle">Subtitle is required.</small>
                     </div>
 
                     <div class="field">
                         <label for="description">Description</label>
-                        <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
+                        <Textarea id="description" v-model="chapter.description" required="true" rows="3" cols="20" />
                     </div>
 
                     <div class="field">
                         <label for="description">Icon</label>
-                        <Dropdown  :options="icons" v-model.trim="product.icon" optionLabel="name" placeholder="Select an icon" class="w-full" filter >
+                        <Dropdown  :options="icons" v-model.trim="chapter.icon" optionLabel="name" placeholder="Select an icon" class="w-full" filter >
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
                                     <div><i :class="'fa '+ slotProps.value.name"></i> {{ slotProps.value.name }}</div>
@@ -210,33 +233,30 @@ const initFilters = () => {
                     </div>
 
                     <div class="field">
-                        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
-                        <Dropdown id="inventoryStatus" v-model="product.status" :options="courseStatuses" optionLabel="label" placeholder="Select a Status">
+                        <label for="inventoryStatus" class="mb-3">Status</label>
+                        <Dropdown id="inventoryStatus" v-model="chapter.status" :options="courseStatuses" optionLabel="label" placeholder="Select a Status">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value && slotProps.value.value">
                                     <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
                                 </div> 
-
-                                <!-- <div v-if="slotProps.value && slotProps.value.value">
-                                    <span :class="'product-badge status-' + slotProps.value.value">{{ slotProps.value.label }}</span>
-                                </div>
-                                <div v-else-if="slotProps.value && !slotProps.value.value">
-                                    <span :class="'product-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value }}</span>
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span> -->
                             </template>
                         </Dropdown>
                     </div>
 
                     <div class="field">
-                        <label class="mb-3">Category</label>
+                        <label class="mb-3">Course</label>
                         <div class="formgrid grid" v-if="modules">
                             <div class="field-radiobutton col-6" v-for="module in modules" :key="module.id">
-                                <RadioButton :inputId="'category'+module.id" name="category" :value="module.id" v-model="product.module_id" />
+                                <RadioButton :inputId="'category'+module.id" name="category" :value="module.id" v-model="chapter.module_id" />
                                 <label :for="'category'+module.id">{{module.title}}</label>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="mb-3">File</label>
+                        <div>
+                            <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" accept="image/*" :maxFileSize="20000000" />
                         </div>
                     </div>
 
@@ -249,8 +269,8 @@ const initFilters = () => {
                  <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product"
-                            >Are you sure you want to delete <b>{{ product.name }}</b
+                        <span v-if="course"
+                            >Are you sure you want to delete <b>{{ course.title }}</b
                             >?</span
                         >
                     </div>

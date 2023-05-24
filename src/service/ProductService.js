@@ -11,12 +11,37 @@ export default class ProductService {
     }
 
     addCourses(course) {
+        if(course.file){
+            var fileData = new FormData();
+            fileData.append('file', course.file);
+        }
         return axios.post('/create-course', {
             ...course,
             status : course.status.value,
-            icon: course.icon.code
+            icon: course.icon.code,
+            },{
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }})
+          .then((res) => res.data)
+          .catch(function (error) {
+            error;
+          });
+     }
 
-          })
+     updateCourses(course) {
+        if(course.file){
+            var fileData = new FormData();
+            fileData.append('file', course.file);
+        }
+        return axios.post('/update-course', {
+            ...course,
+            status : course.status.value,
+            icon: course.icon.code,
+            },{
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }})
           .then((res) => res.data)
           .catch(function (error) {
             error;
@@ -58,22 +83,4 @@ export default class ProductService {
               error;
          });
      }
-
-    getProductsSmall() {
-        return fetch(contextPath + 'demo/data/products-small.json')
-            .then((res) => res.json())
-            .then((d) => d.data);
-    }
-
-    getProducts() {
-        return fetch(contextPath + 'demo/data/products.json')
-            .then((res) => res.json())
-            .then((d) => d.data);
-    }
-
-    getProductsWithOrdersSmall() {
-        return fetch(contextPath + 'demo/data/products-orders-small.json')
-            .then((res) => res.json())
-            .then((d) => d.data);
-    }
 }
