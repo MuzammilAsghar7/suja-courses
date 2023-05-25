@@ -139,11 +139,8 @@ const initFilters = () => {
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <router-link  :to="{ path: 'add-question', query: { questionId:slotProps.data.id,lessonId,edit:true  }}">
+                            <router-link  :to="{ path: 'add-question', query: { questionId:slotProps.data.id,lessonId,edit:true,chapterId  }}">
                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" />
-                            </router-link>
-                            <router-link :to="{ path: 'add-question', query: { lessonId  }}">
-                               <Button icon="pi pi-plus" class="p-button-rounded p-button-success mr-2" />
                             </router-link>
                             <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" /> -->
                         </template>

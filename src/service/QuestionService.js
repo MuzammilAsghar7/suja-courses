@@ -18,7 +18,13 @@ export default class QuestionService {
     }
 
     addQuestion(payload) {
-        return axios.post(`add-question`,payload)
+        var fileData = new FormData();
+        fileData.append('file', payload.file);
+        return axios.post(`add-question`,payload,{
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        })
         .then((res) => res.data)
         .catch(function (error) {
             error;
@@ -26,7 +32,13 @@ export default class QuestionService {
     }
 
     updateQuestion(id,payload) {
-        return axios.post(`/questions/${id}`, payload)
+        var fileData = new FormData();
+        fileData.append('file', payload.file);
+        return axios.post(`/questions/${id}`, payload,{
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        })
         .then((res) => res.data)
         .catch(function (error) {
             error;

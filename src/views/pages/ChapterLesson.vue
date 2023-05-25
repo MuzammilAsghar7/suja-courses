@@ -138,7 +138,7 @@ const initFilters = () => {
                         <template #body="slotProps">
                             <div v-if="slotProps.data.multiple != 1 && slotProps.data.parent == 0">
                                 <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}" v-if="slotProps.data.questions_count > 0">
-                                <Button type="button" label="Questions" :badge="slotProps.data.questions_count" class="p-button-warning" />
+                                    <Button type="button" label="Questions" :badge="slotProps.data.questions_count" class="p-button-warning" />
                                 </RouterLink>
                                 <span v-else>Not Found any question</span>
                             </div>
@@ -147,6 +147,9 @@ const initFilters = () => {
                             </div>
                             <div v-else-if="slotProps.data.parent != 0">
                                 {{slotProps.data.lessonname.title}}
+                                <RouterLink :to="{ path: '/questions', query: { chapterId,lessonId:slotProps.data.id }}" v-if="slotProps.data.questions_count > 0">
+                                    <Button type="button" label="Questions" :badge="slotProps.data.questions_count" class="p-button-warning" />
+                                </RouterLink>
                             </div>
                         </template>
                     </Column>
@@ -155,12 +158,12 @@ const initFilters = () => {
                         <template #body="slotProps">
                             <div v-if="slotProps.data.multiple != 1">
                                 <router-link  :to="{ path: '/add-question', query: { lessonId:slotProps.data.id,chapterId  }}">
-                                    <Button icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
+                                    <Button label="Add Question" icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
                                 </router-link>
                             </div>
                             <div v-else>
                                 <router-link  :to="{ path: '/add-innerlesson', query: { lessonId:slotProps.data.id,chapterId  }}">
-                                    <Button icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
+                                    <Button label="Add InnerLesson" icon="pi pi-plus" class="p-button-rounded mr-2 mb-2" />
                                 </router-link>
                             </div>
                         </template>
