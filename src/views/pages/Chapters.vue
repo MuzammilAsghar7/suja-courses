@@ -257,7 +257,7 @@ const initFilters = () => {
                        <div >
                         <label class="mb-1 block">File</label>
                         <div>
-                            <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" accept="image/*" :maxFileSize="20000000" />
+                            <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" :maxFileSize="20000000" />
                         </div>
                        </div>
                        <div >

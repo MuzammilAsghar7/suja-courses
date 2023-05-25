@@ -44,7 +44,7 @@ const productService = new ProductService();
 onMounted(()=>{
     if(edit){
         console.log('edit is here')
-        pageTitle.value = "Edit lesson"
+        pageTitle.value = "Edit Question"
         questionService.getQuestion(questionId).then((data) => { 
             question.value = {...question.value, ...data.question}; 
            console.log(data.question); 
@@ -81,7 +81,7 @@ const selectedfalse = (index) => {
         }
     });
 
-    console.log(selectedmcqs.value)
+    
 }
 
 const addMoreQuestion = () => {
@@ -90,7 +90,8 @@ const addMoreQuestion = () => {
     console.log(mcqs.value);
 }
 const saveQuestion = () => {
-    
+    console.log(selectedmcqs.value)
+    console.log(mcqs);
     question.value.mcqs=mcqs;
     if(!question.value.type){
         toast.add({ severity: 'error', summary: 'Error', detail: 'select qustion type', life: 3000 })
@@ -115,6 +116,7 @@ const saveQuestion = () => {
         .then((data) => {
             loading.value=false;  
             toast.add({ severity: 'success', summary: 'Updated', detail: 'Question has been updated Successfully.', life: 3000 });
+            router.push(`/chapters/${chapterId}/lessons`);
         });
     }
     else{
@@ -132,6 +134,11 @@ const saveQuestion = () => {
         })
     }
 };
+
+const fileSelect = async (event) => {
+    question.value.file = await event.files[0];
+}
+
 const onAdvancedUpload = async (event) => {
     lesson.value.file = await event.files[0];
 }
@@ -150,8 +157,7 @@ const removeMCQ = (index) => {
     <div className="grid">
         <!-- <pre>
             {{ question }}
-            {{ selectedmcqs }}
-            {{ selectedCountry }}
+            
         </pre> -->
         <Toast />
         <div className="col-12">
@@ -165,12 +171,15 @@ const removeMCQ = (index) => {
                             <label for="username" class="p-sr-only">Title</label>
                             <InputText v-model="question.title" id="username" placeholder="Title" class="w-full" />
                         </div>
+                        <div class="mb-3 gap-2 w-100">
+                        <label class="mb-1 block">Question Image</label>
+                            <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" :maxFileSize="20000000" />
+                        </div>
 
                         <div class="mb-4 gap-2 w-100 hidden">
                             <Editor  v-model="question.description" editorStyle="height: 320px" />
                         </div>
  
-
                         <div class="mb-3 gap-2 w-100 hidden">
                             <label for="Content" class="p-sr-only">Content</label>
                             <Textarea v-model="question.excerpt" id="Content" autoResize placeholder="Content" class="w-full" rows="6" cols="30" />
@@ -188,7 +197,11 @@ const removeMCQ = (index) => {
                        </div>
 
                         <div class="mcqs" v-if="question.type == 3">
-                            <span class="block font-semibold text-900 text-lg mb-3 mt-4 flex">
+                            <div class="flex align-items-center mt-5    ">
+                                   <Checkbox v-model="question.allow_description" inputId="allow_desc" :binary="true"  />
+                                   <label for="allow_desc" class="ml-2"> Allow user to submit description. </label>
+                                </div>
+                            <span class="block font-semibold text-900 text-lg mb-3  flex">
                                 <h5 class="mb-2 mt-3">Add Multiple Choice Questions</h5>
                             </span>
                             <div class="grid">
