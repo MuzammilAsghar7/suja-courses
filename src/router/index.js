@@ -13,7 +13,7 @@ const router = createRouter({
                 {
                     path: '/',
                     name: 'dashboard',
-                    component: () => import('@/views/Dashboard.vue')
+                    component: () => import('@/views/pages/Chapters.vue')
                 },
                 {
                     path: '/chapters',
@@ -49,6 +49,11 @@ const router = createRouter({
                     path: '/add-innerlesson/',
                     name: 'add-innerlesson',
                     component: () => import('@/views/pages/Questions/AddInnerLesson.vue')
+                },
+                {
+                    path: '/users/',
+                    name: 'users',
+                    component: () => import('@/views/pages/User/Users.vue')
                 },
                 {
                     path: '/uikit/formlayout',

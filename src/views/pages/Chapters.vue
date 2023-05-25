@@ -59,7 +59,10 @@ const formatCurrency = (value) => {
 };
 
 const openNew = () => {
-    chapter.value = {};
+    chapter.value = {status: {
+    label: "ENABLE",
+    value: 1
+  }};
     editCourse.value = false;
     submitted.value = false;
     productDialog.value = true;
@@ -72,9 +75,8 @@ const hideDialog = () => {
 
 const saveProduct = () => {
     submitted.value = true;
-    console.log(chapter.value);
     if(editCourse.value){
-       
+
         productService.updateCourses(chapter.value).then((response) => { 
             if(response.status){
                 toast.add({ severity: 'success', summary: 'Chapter Added Successfully.', detail: 'Message Content', life: 3000 });
@@ -104,7 +106,8 @@ const editProduct = (Chapter) => {
     chapter.value = { 
         ...Chapter,
         status : { label: 'ENABLE', value: "1" },
-        icon : { name: Chapter.icon, code: Chapter.icon } 
+        icon : { name: Chapter.icon, code: Chapter.icon }, 
+        parent : Chapter.parent == 1 ? true : false,  
     };
     editCourse.value = true;
     productDialog.value = true;
@@ -135,9 +138,9 @@ const initFilters = () => {
 
 <template>
     <div class="grid">
-        <pre>
+        <!-- <pre>
         {{  chapter  }}
-    </pre>
+    </pre> -->
         <div class="col-12">
             <div class="card">
                 <Toast />
