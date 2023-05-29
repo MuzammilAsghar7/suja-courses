@@ -35,7 +35,7 @@ export default class QuestionService {
       });
     }
 
-    deleteMediaItem(id){
+  deleteMediaItem(id){
      return axios.post('/delete-media-item/'+id)
      .then((res) => res.data)
      .catch(function (error) {

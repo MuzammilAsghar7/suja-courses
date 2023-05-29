@@ -1,5 +1,5 @@
 import axios from 'axios';
-axios.defaults.baseURL = 'http://192.168.1.20:8000/api';
+axios.defaults.baseURL = 'https://suja.vmi12.com/api';
 
 const AxiosPlugin = {
   install(app) {

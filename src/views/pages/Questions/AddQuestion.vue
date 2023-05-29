@@ -43,11 +43,10 @@ const questionService = new QuestionService();
 const productService = new ProductService();
 onMounted(()=>{
     if(edit){
-        console.log('edit is here')
         pageTitle.value = "Edit Question"
         questionService.getQuestion(questionId).then((data) => { 
-            question.value = {...question.value, ...data.question}; 
-           console.log(data.question); 
+            question.value = {...question.value, ...data.question,allow_description: (data.question.allow_description == 1) ? true : false}; 
+            console.log(data.question); 
             loading.value=false;
             if(data.question.selectedmcqs){
                 mcqs.value = data.question.selectedmcqs;
@@ -72,7 +71,6 @@ const handleQuestionType = (event) => {
 }
 
 const selectedfalse = (index) => {
-    
     mcqs.value.forEach((element, index2) => {
         if(index2 == index){
             mcqs.value[index2].status = true
@@ -80,8 +78,6 @@ const selectedfalse = (index) => {
             mcqs.value[index2].status = false
         }
     });
-
-    
 }
 
 const addMoreQuestion = () => {
@@ -135,6 +131,17 @@ const saveQuestion = () => {
     }
 };
 
+let isImgUrl = (url) => {
+  return /\.(jpg|jpeg|png|webp|avif|gif)$/.test(url)
+}
+
+const deletMedia = (id) => {
+    questionService.deleteMediaItem(id).then((response) => { 
+        question.value.questionimage = '';
+        toast.add({ severity: 'success', summary: 'Added', detail: 'Lesson has been added Successfully.', life: 3000 })
+    })
+}
+
 const fileSelect = async (event) => {
     question.value.file = await event.files[0];
 }
@@ -148,16 +155,12 @@ const removeFileFromQuestion = () => {
 const removeMCQ = (index) => {
     mcqs.value.splice(index,1);
 }
-
-
-// const { layoutConfig, layoutState, setActiveMenuItem, onMenuToggle } = useLayout();
 </script>
 
 <template>
     <div className="grid">
         <!-- <pre>
             {{ question }}
-            
         </pre> -->
         <Toast />
         <div className="col-12">
@@ -172,6 +175,16 @@ const removeMCQ = (index) => {
                             <InputText v-model="question.title" id="username" placeholder="Title" class="w-full" />
                         </div>
                         <div class="mb-3 gap-2 w-100">
+                        <div class="media-wrap relative mb-3" v-if="question.questionimage">
+                        <Button icon="pi pi-trash" class="p-button-rounded mr-2 mb-2 z-2 absolute right-0" @click="deletMedia(question.value.id)"/>
+                        
+                        <img v-if="isImgUrl(question.questionimage)" :src="question.questionimage">
+                        <video v-else width="320" height="240" class="w-full" controls>
+                            <source :src="question.questionimage" type="video/mp4">
+                            <source :src="question.questionimage" type="video/ogg">
+                            Your browser does not support the video tag.
+                        </video>
+                        </div>
                         <label class="mb-1 block">Question Image</label>
                             <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" :maxFileSize="20000000" />
                         </div>

@@ -14,24 +14,25 @@ const editCourse = ref(false);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const user = ref({});
+const loading = ref(true)
 const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
-
 const users = ref(null);
-
 const userService = new UserService();
-
 const fileSelect = async (event) => {
     console.log(await event.files[0]);
     chapter.value.file = await event.files[0];
+}
+const getAllUser = () => { 
+    userService.getAllUsers().then((data) => {users.value = data.users; loading.value=false; console.log(data)});
 }
 
 onBeforeMount(() => {
     initFilters();
 });
 onMounted(async () => {
-    userService.getAllUsers().then((data) => {users.value = data.users; console.log(data)});
+    getAllUser();
 });
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -62,12 +63,13 @@ const saveUser = () => {
         return false;
     } 
 
-    console.log(user.value);
     if(editCourse.value){
        
         userService.updateUser(chapter.value).then((response) => { 
             if(response.status){
-                toast.add({ severity: 'success', summary: 'Chapter Added Successfully.', detail: 'Message Content', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Updated', detail: 'User Updated Successfully!.', life: 3000 });
+                hideDialog();
+                getAllUser();
             }else
             {
                 let errorKey = Object.keys(response.error);
@@ -79,7 +81,9 @@ const saveUser = () => {
     {
         userService.addUser(user.value).then((response) => { 
             if(response.status){
-                toast.add({ severity: 'success', summary: 'Chapter Added Successfully.', detail: 'Message Content', life: 3000 });
+                toast.add({ severity: 'success', summary: 'User Saved', detail: 'User added Successfully!', life: 3000 });
+                hideDialog();
+                getAllUser();
             }else
             {
                 let errorKey = Object.keys(response.error);
@@ -88,7 +92,6 @@ const saveUser = () => {
         });
     }
 };
-
 const editProduct = (User) => {
     console.log(User);
     user.value = User;
@@ -125,12 +128,13 @@ const initFilters = () => {
         {{  user  }}
     </pre> -->
         <div class="col-12">
-            <div class="card">
+            <div class="card" style="min-height: 374px;">
+
                 <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
-                            <Button label="New Chapter" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                            <Button label="New User" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
                         </div>
                     </template>
                 </Toolbar>
@@ -139,7 +143,41 @@ const initFilters = () => {
                    
                     ref="dt"
                     :value="users"
+                    :loading="loading"
                 >
+                <template #loading>
+                    <div class="bg-white h-full w-full">
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                    <Skeleton class="mb-2" height="2rem"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    <Skeleton width="100%" height="2rem" class="mb-2"></Skeleton>
+                    </div>
+                </div>
+                </template>
+                
                 <Column field="name" header="Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                     <template #body="slotProps">
                         <span class="p-column-title">Name</span>

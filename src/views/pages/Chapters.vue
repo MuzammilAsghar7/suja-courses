@@ -102,12 +102,12 @@ const saveProduct = () => {
 };
 
 const editProduct = (Chapter) => {
-    console.log(chapter);
     chapter.value = { 
         ...Chapter,
         status : { label: 'ENABLE', value: "1" },
         icon : { name: Chapter.icon, code: Chapter.icon }, 
         parent : Chapter.parent == 1 ? true : false,  
+        module_id : parseInt(Chapter.module_id)
     };
     editCourse.value = true;
     productDialog.value = true;
@@ -125,7 +125,9 @@ const deleteProduct = () => {
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
 };
 
-
+let isImgUrl = (url) => {
+  return /\.(jpg|jpeg|png|webp|avif|gif)$/.test(url)
+}
 const confirmDeleteSelected = () => {
     deleteProductsDialog.value = true;
 };
@@ -257,7 +259,7 @@ const initFilters = () => {
                     </div>
 
                     <div class="field flex gap-3">
-                       <div >
+                       <div>
                         <label class="mb-1 block">File</label>
                         <div>
                             <FileUpload mode="basic" @select="fileSelect($event)" :multiple="false" :maxFileSize="20000000" />
@@ -270,6 +272,24 @@ const initFilters = () => {
                         </div>
                        </div>
                     </div>
+                    <div class="" v-if="chapter.chapterimage">
+                            <Image alt="Image" preview v-if="isImgUrl(chapter.chapterimage)">
+                                <template #indicatoricon>
+                                    <i class="pi pi-check"></i>
+                                </template>
+                                <template #image>
+                                    <img src="https://primefaces.org/cdn/primevue/images/galleria/galleria12s.jpg" alt="image" />
+                                </template>
+                                <template #preview="slotProps">
+                                    <img src="https://primefaces.org/cdn/primevue/images/galleria/galleria12.jpg" alt="preview" :style="slotProps.style" @click="slotProps.onClick" />
+                                </template>
+                            </Image>
+                            <video width="100" height="200" controls v-else style="width: 100%;">
+                                <source :src="chapter.chapterimage" type="video/mp4">
+                                <source :src="chapter.chapterimage" type="video/ogg">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />

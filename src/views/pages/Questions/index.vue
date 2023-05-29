@@ -17,6 +17,7 @@ const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const product = ref({});
+const question = ref({});
 const selectedProducts = ref(null);
 const loading = ref(true)
 const dt = ref(null);
@@ -29,9 +30,18 @@ const courseStatuses = ref([
 
 let lessonId = route.query.lessonId;
 let chapterId = route.query.chapterId;
-
 const questions = ref(null);
 const questionService = new QuestionService();
+const confirmDeleteProduct = (editProduct) => {
+    console.log(editProduct);
+    question.value = editProduct;
+    deleteProductDialog.value = true;
+};
+
+const getAllQuestions = () => {
+    questionService.getAllQuestions({lessonId,chapterId}).then((data) => { questions.value = data.questions; loading.value=false; });
+}
+
 onBeforeMount(() => {
     initFilters();
 });
@@ -39,15 +49,20 @@ onMounted(async () => {
     if(!lessonId || !chapterId){
         router.push('/');
     }
-    questionService.getAllQuestions({lessonId,chapterId}).then((data) => { questions.value = data.questions; loading.value=false; });
-    console.log(questions);
-    
+    getAllQuestions();
 });
 
-const exportCSV = () => {
-    dt.value.exportCSV();
+const deleteQuestions = () => {
+    deleteProductDialog.value = false;
+    questionService.deleteQuestion(question.value.id).then((data) => {
+        if(data.status == 1)
+        {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Question Deleted', life: 3000 });
+        }
+        getAllQuestions();
+        question.value = '';
+     });
 };
-
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -66,7 +81,7 @@ const initFilters = () => {
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
-                         <RouterLink to="add-question">
+                         <RouterLink :to="{ path: '/add-question', query: { chapterId,lessonId }}">
                             <Button label="New Quetion" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
                          </RouterLink>
                             <!-- <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" /> -->
@@ -79,7 +94,7 @@ const initFilters = () => {
                     :value="questions"
                     :loading="loading"
                     paginator 
-                    :rows="5" 
+                    :rows="25" 
                     :rowsPerPageOptions="[5, 10, 20, 50]"
                 >
                 <template #header>
@@ -142,10 +157,24 @@ const initFilters = () => {
                             <router-link  :to="{ path: 'add-question', query: { questionId:slotProps.data.id,lessonId,edit:true,chapterId  }}">
                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" />
                             </router-link>
-                            <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" /> -->
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
                     </Column>
                 </DataTable>
+
+                <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+                    <div class="flex align-items-center justify-content-center">
+                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                        <span v-if="question"
+                            >Are you sure you want to delete <b>{{ question.title }}</b
+                            >?</span
+                        >
+                    </div>
+                    <template #footer>
+                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteQuestions" />
+                    </template>
+                </Dialog>
 
             </div>
         </div>

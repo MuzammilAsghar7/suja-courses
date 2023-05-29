@@ -77,7 +77,7 @@ const initFilters = () => {
                     :value="questions"
                     :loading="loading"
                     paginator 
-                    :rows="5" 
+                    :rows="100" 
                     :rowsPerPageOptions="[5, 10, 20, 50]"
                 >
                     <template #header>

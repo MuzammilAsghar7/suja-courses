@@ -46,10 +46,19 @@ export default class QuestionService {
     }
 
     deleteQuestion(id) {
-        return axios.get(`/questions/${id}`)
+        return axios.delete(`/questions/${id}`)
         .then((res) => res.data)
         .catch(function (error) {
             error;
         });
     }
+
+    deleteMediaItem(id){
+        return axios.delete('/delete-question-media/'+id)
+        .then((res) => res.data)
+        .catch(function (error) {
+            console.log(error)
+          });
+     }
+   
 }
